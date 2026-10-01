@@ -2,6 +2,8 @@
 
 A blind top-ranking game. Someone sets a secret ranking; you see the items one at a time and lock each into a rank before you know what comes next.
 
+**Play it live: https://shekharsanskar9.github.io/Hunch/**
+
 ## Features
 - **Blind ranking**: items are revealed one by one and every placement is final.
 - **23 topics, 41 ready-made rankings**: sports, science, education, coding, databases, apps, social media, brands, fashion, cars, bikes, travel, colors, drinks, chocolates, pens, video games, retro games and more.

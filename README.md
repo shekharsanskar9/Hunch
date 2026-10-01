@@ -9,9 +9,10 @@ A blind top-ranking game. Someone sets a secret ranking; you see the items one a
 - **23 topics, 41 ready-made rankings**: sports, science, education, coding, databases, apps, social media, brands, fashion, cars, bikes, travel, colors, drinks, chocolates, pens, video games, retro games and more.
 - **Set your own**: build a Top 3–10 ranking and share it with a link.
 - **Scoring**: 100 / 60 / 30 points for exact / off by one / off by two, with titles from Rookie to Legend.
+- **Community rankings and leaderboards**: sign in with Google to publish (5 per day) and to appear on the per-ranking and all-time leaderboards. Backed by Firebase on the free plan; see [FIREBASE_SETUP.md](FIREBASE_SETUP.md).
 - **Mind-Reader mode**: your friend sends back their guess, and you predict where they placed every item.
 
-No backend. Everything runs in the browser and saves to local storage.
+Without Firebase configured, everything runs in the browser and saves to local storage.
 
 ## Run
 Open `index.html`, or serve the folder:

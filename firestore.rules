@@ -1,11 +1,36 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // Per-user, per-day publish counter (UTC day). Keep the limit in sync
+    // with DAILY_LIMIT in index.html.
+    function dayKey(uid) {
+      return uid + '_' + string(request.time.year()) + '_' + string(request.time.month()) + '_' + string(request.time.day());
+    }
+    function limitPath(uid) {
+      return /databases/$(database)/documents/limits/$(dayKey(uid));
+    }
+
+    match /limits/{lid} {
+      allow read: if request.auth != null && lid.matches(request.auth.uid + '_.*');
+      allow create: if request.auth != null
+        && lid == dayKey(request.auth.uid)
+        && request.resource.data.keys().hasOnly(['count'])
+        && request.resource.data.count == 1;
+      allow update: if request.auth != null
+        && lid == dayKey(request.auth.uid)
+        && request.resource.data.keys().hasOnly(['count'])
+        && request.resource.data.count == resource.data.count + 1
+        && request.resource.data.count <= 5;
+      allow delete: if false;
+    }
+
     match /rankings/{id} {
       // Anyone can read the community rankings.
       allow read: if true;
 
-      // Only signed-in users can publish, and only as themselves.
+      // Signed-in users only, as themselves, max 5 per day. The same batch
+      // must bump the user's daily counter by exactly one.
       allow create: if request.auth != null
         && request.resource.data.keys().hasOnly(['t', 'c', 'i', 'uid', 'name', 'createdAt'])
         && request.resource.data.uid == request.auth.uid
@@ -15,11 +40,47 @@ service cloud.firestore {
         && request.resource.data.i is list
         && request.resource.data.i.size() >= 3 && request.resource.data.i.size() <= 10
         && request.resource.data.name is string && request.resource.data.name.size() <= 80
-        && request.resource.data.createdAt == request.time;
+        && request.resource.data.createdAt == request.time
+        && existsAfter(limitPath(request.auth.uid))
+        && getAfter(limitPath(request.auth.uid)).data.count
+             == (exists(limitPath(request.auth.uid)) ? get(limitPath(request.auth.uid)).data.count : 0) + 1
+        && getAfter(limitPath(request.auth.uid)).data.count <= 5;
 
       // Rankings are immutable; only the creator can delete their own.
       allow update: if false;
       allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
+
+    // Best score per player per ranking: scores/{rankingId}/entries/{uid}
+    match /scores/{rid}/entries/{uid} {
+      allow read: if true;
+      allow create, update: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['name', 'pct', 'pts', 'updatedAt'])
+        && request.resource.data.name is string && request.resource.data.name.size() <= 80
+        && request.resource.data.pct is int
+        && request.resource.data.pct >= 0 && request.resource.data.pct <= 100
+        && request.resource.data.pts is int
+        && request.resource.data.pts >= 0 && request.resource.data.pts <= 1000
+        && (resource == null || request.resource.data.pct > resource.data.pct)
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+
+    // Lifetime totals for the global leaderboard: players/{uid}
+    match /players/{uid} {
+      allow read: if true;
+      allow create, update: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['name', 'points', 'played', 'updatedAt'])
+        && request.resource.data.name is string && request.resource.data.name.size() <= 80
+        && request.resource.data.points is int
+        && request.resource.data.played is int
+        && request.resource.data.points - (resource == null ? 0 : resource.data.points) >= 0
+        && request.resource.data.points - (resource == null ? 0 : resource.data.points) <= 1000
+        && request.resource.data.played - (resource == null ? 0 : resource.data.played) == 1
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
     }
   }
 }

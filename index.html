@@ -158,6 +158,13 @@ input:focus,select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 
 .auth img,.auth .av{width:28px;height:28px;border-radius:50%;border:1px solid var(--line);object-fit:cover}
 .auth .av{display:grid;place-items:center;font-size:12px;font-weight:800;background:var(--surface-2)}
 .auth .nm{font-size:13px;color:var(--ink-2);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb{display:grid;gap:6px}
+.lbrow{display:flex;align-items:center;gap:12px;padding:8px 10px;border:1px solid var(--line);border-radius:4px;font-size:14px}
+.lbrow .n{width:26px;height:26px;flex:none;border:1px solid var(--line);border-radius:4px;display:grid;place-items:center;font:600 12px var(--mono);color:var(--ink-2)}
+.lbrow:nth-child(1) .n{border-color:#fcd34d;color:#fcd34d}.lbrow:nth-child(2) .n{border-color:#d1d5db;color:#d1d5db}.lbrow:nth-child(3) .n{border-color:#d08a5a;color:#d08a5a}
+.lbrow .nm2{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.lbrow .pts{font:600 12px var(--mono);color:var(--ink-2)}
+.lbrow.me{border-color:var(--blue);background:rgba(59,130,246,.08)}
 .note{border:1px dashed var(--line);border-radius:4px;padding:10px 12px;font-size:13px;color:var(--ink-2);margin-bottom:14px;line-height:1.5}
 .empty{color:var(--muted);text-align:center;padding:28px 0}
 .footer{margin:32px 0 8px;padding-top:16px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;justify-content:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
@@ -298,10 +305,11 @@ async function initFirebase(){
   try{
     const base='https://www.gstatic.com/firebasejs/10.12.5/';
     const [{initializeApp},A,F]=await Promise.all([import(base+'firebase-app.js'),import(base+'firebase-auth.js'),import(base+'firebase-firestore.js')]);
-    const app=initializeApp(FIREBASE_CONFIG),auth=A.getAuth(app),db=F.getFirestore(app);
+    const app=initializeApp(FIREBASE_CONFIG),auth=A.getAuth(app);
+    let db;try{db=F.initializeFirestore(app,{localCache:F.persistentLocalCache({tabManager:F.persistentMultipleTabManager()})})}catch(e){db=F.getFirestore(app)}
     fb={A,F,auth,db};
     A.onAuthStateChanged(auth,u=>{user=u;renderAuth();if(current==='home')renderHome()});
-    F.onSnapshot(F.query(F.collection(db,'rankings'),F.orderBy('createdAt','desc'),F.limit(60)),snap=>{
+    F.onSnapshot(F.query(F.collection(db,'rankings'),F.orderBy('createdAt','desc'),F.limit(40)),snap=>{
       community=snap.docs.map(d=>({id:d.id,...d.data()})).filter(l=>typeof l.t==='string'&&Array.isArray(l.i)&&l.i.length>=3&&l.i.every(x=>typeof x==='string'));
       if(current==='home')renderHome();
     },e=>{console.warn(e);toast('Could not load community rankings')});
@@ -324,7 +332,56 @@ function renderAuth(){
     document.getElementById('si').onclick=signIn;
   }
 }
-const publish=(t,c,items)=>fb.F.addDoc(fb.F.collection(fb.db,'rankings'),{t,c,i:items,uid:user.uid,name:user.displayName||'Anonymous',createdAt:fb.F.serverTimestamp()});
+const DAILY_LIMIT=5;
+const dayKey=uid=>{const d=new Date();return uid+'_'+d.getUTCFullYear()+'_'+(d.getUTCMonth()+1)+'_'+d.getUTCDate()};
+const hash=x=>{let h=5381;for(let i=0;i<x.length;i++)h=((h<<5)+h+x.charCodeAt(i))|0;return (h>>>0).toString(36)};
+const ridOf=l=>l.community&&l.id?l.id:'p_'+hash(keyOf(l));
+const limitMsg=()=>`Daily limit reached (${DAILY_LIMIT} rankings per day). Try again tomorrow.`;
+async function publish(t,c,items){
+  const {F,db}=fb,lref=F.doc(db,'limits',dayKey(user.uid)),snap=await F.getDoc(lref),n=snap.exists()?snap.data().count:0;
+  if(n>=DAILY_LIMIT)throw new Error('limit');
+  const batch=F.writeBatch(db);
+  batch.set(lref,{count:n+1});
+  batch.set(F.doc(F.collection(db,'rankings')),{t,c,i:items,uid:user.uid,name:user.displayName||'Anonymous',createdAt:F.serverTimestamp()});
+  await batch.commit();
+}
+
+/* ---------- Leaderboards ---------- */
+let leaders=null,leadersAt=0;
+const lbRow=(k,name,val,me)=>`<div class="lbrow${me?' me':''}"><span class="n">${k+1}</span><span class="nm2">${esc(name||'Player')}</span><span class="pts">${val}</span></div>`;
+function drawLeaders(){
+  const el=document.getElementById('lb');if(!el||!leaders)return;
+  el.innerHTML=leaders.length?leaders.map((p,k)=>lbRow(k,p.name,p.points.toLocaleString()+' pts',user&&p.uid===user.uid)).join(''):'<div class="empty">No scores yet — be the first on the board.</div>';
+}
+async function loadLeaders(){
+  if(!fb)return;
+  drawLeaders();
+  if(leaders&&Date.now()-leadersAt<60000)return;
+  try{
+    const sn=await fb.F.getDocs(fb.F.query(fb.F.collection(fb.db,'players'),fb.F.orderBy('points','desc'),fb.F.limit(10)));
+    leaders=sn.docs.map(d=>({uid:d.id,...d.data()}));leadersAt=Date.now();drawLeaders();
+  }catch(e){console.warn(e);const el=document.getElementById('lb');if(el)el.innerHTML='<div class="empty">Leaderboard unavailable right now.</div>'}
+}
+async function showBoard(l,pct,pts){
+  const el=document.getElementById('board');if(!el||!FB_ON)return;
+  if(!fb){el.innerHTML='<div class="empty">Leaderboard is connecting…</div>';return}
+  const {F,db}=fb,rid=ridOf(l),nm=user&&(user.displayName||'Player');
+  el.innerHTML='<div class="mono-label" style="margin-bottom:10px">🏆 Leaderboard · this ranking</div><div class="empty">Loading…</div>';
+  try{
+    if(user){
+      const ref=F.doc(db,'scores',rid,'entries',user.uid),cur=await F.getDoc(ref);
+      if(!cur.exists()||pct>cur.data().pct)await F.setDoc(ref,{name:nm,pct,pts,updatedAt:F.serverTimestamp()});
+      await F.setDoc(F.doc(db,'players',user.uid),{name:nm,points:F.increment(pts),played:F.increment(1),updatedAt:F.serverTimestamp()},{merge:true});
+      leadersAt=0;
+    }
+    const sn=await F.getDocs(F.query(F.collection(db,'scores',rid,'entries'),F.orderBy('pct','desc'),F.limit(10)));
+    const rows=sn.docs.map((d,k)=>lbRow(k,d.data().name,d.data().pct+'%',user&&d.id===user.uid)).join('');
+    el.innerHTML='<div class="mono-label" style="margin-bottom:10px">🏆 Leaderboard · this ranking</div>'
+      +(rows?`<div class="lb">${rows}</div>`:'<div class="empty">No scores yet.</div>')
+      +(user?'':'<div class="note" style="margin:12px 0 0">Sign in with Google to put your score on the board. <button class="sm" id="lbsi" style="margin-left:6px">Sign in</button></div>');
+    const b=document.getElementById('lbsi');if(b)b.onclick=()=>signIn().then(u=>u&&showBoard(l,pct,pts));
+  }catch(e){console.warn(e);el.innerHTML='<div class="empty">Leaderboard unavailable right now.</div>'}
+}
 const badge=c=>{const k=CATS[c]||CATS.General;return `<span class="badge" style="color:${k.color}">${k.icon} ${esc(c)}</span>`};
 function toast(m){const d=document.createElement('div');d.className='toast';d.textContent=m;document.body.appendChild(d);setTimeout(()=>d.remove(),1800)}
 function copyLink(l){
@@ -408,6 +465,9 @@ function renderHome(){
       .map(([ic,v,l])=>`<div class="stat-tile"><div class="stat-top"><span class="stat-icon">${ic}</span></div><div class="stat-value">${v}</div><div class="stat-label">${l}</div></div>`).join('')}
   </div></div>
 
+  ${FB_ON?`<div class="section-head"><h2 style="margin:0">🏆 Top players</h2><span class="mono-label">All-time points</span></div>
+  <div class="card"><div class="lb" id="lb"><div class="empty">Loading…</div></div></div>`:''}
+
   <div class="tabs">
     ${['All',...Object.keys(CATS)].map(c=>`<button class="tab ${c===filter?'active':''}" data-c="${c}">${c==='All'?'':CATS[c].icon+' '}${c}</button>`).join('')}
   </div>
@@ -426,6 +486,7 @@ function renderHome(){
     const l=decode(v.includes('#play=')?v.split('#play=')[1]:v.trim());
     l?renderPlay(l):toast('Invalid code');
   };
+  if(FB_ON)loadLeaders();
   document.getElementById('codeBtn').onclick=openCode;
   document.getElementById('readBtn').onclick=openCode;
     const grid=document.getElementById('grid');
@@ -451,7 +512,7 @@ function renderHome(){
     };
     const up=el.querySelector('[data-u]');
     if(up)up.onclick=async()=>{
-      try{await publish(l.t,l.c,l.i);store.set(store.get().filter(x=>x.id!==l.id));toast('Published for everyone')}catch(e){toast('Could not publish')}
+      try{await publish(l.t,l.c,l.i);store.set(store.get().filter(x=>x.id!==l.id));toast('Published for everyone')}catch(e){toast(e.message==='limit'?limitMsg():'Could not publish')}
     };
     grid.appendChild(el);
   });
@@ -469,7 +530,7 @@ function renderCreate(){
         <label class="field">Title<input id="t" maxlength="80" placeholder="e.g. Greatest football clubs of all time" value="${esc(title)}"></label>
         <label class="field">Topic<select id="c">${Object.keys(CATS).map(c=>`<option ${c===cat?'selected':''}>${c}</option>`).join('')}</select></label>
       </div>
-      ${FB_ON?(user?`<div class="note">Publishing as <b>${esc(user.displayName||'you')}</b>. Everyone will see this ranking on the home page.</div>`:'<div class="note">Sign in with Google to publish this ranking for everyone. You can fill it in first.</div>'):'<div class="note">Online sharing is not set up, so this ranking is saved on this device only. You can still share it by link.</div>'}
+      ${FB_ON?(user?`<div class="note">Publishing as <b>${esc(user.displayName||'you')}</b>. Everyone will see this ranking on the home page. Limit: ${DAILY_LIMIT} new rankings per day.</div>`:'<div class="note">Sign in with Google to publish this ranking for everyone. You can fill it in first.</div>'):'<div class="note">Online sharing is not set up, so this ranking is saved on this device only. You can still share it by link.</div>'}
       <div class="field">Size</div>
       <div class="chips" style="margin:-8px 0 16px">${[3,4,5,6,8,10].map(x=>`<button class="chip ${x===n?'on':''}" data-n="${x}">Top ${x}</button>`).join('')}</div>
       <div class="field" style="margin-bottom:8px">Your ranking — #1 first. Use ↑ ↓ to reorder.</div>
@@ -498,7 +559,7 @@ function renderCreate(){
         if(!fb)return toast('Still connecting — try again in a moment');
         if(!user&&!(await signIn()))return;
         try{await publish(t,c,items);copyLink({t,c,i:items});toast('Published for everyone · link copied')}
-        catch(e){return toast('Could not publish ('+(e.code||'error')+')')}
+        catch(e){return toast(e.message==='limit'?limitMsg():'Could not publish ('+(e.code||'error')+')')}
         return renderHome();
       }
       const l={id:Date.now(),t,c,i:items};
@@ -557,6 +618,7 @@ function renderPlay(l){
     <div class="card" style="max-width:620px;margin:22px auto">
       ${bar('Exact',exact,'var(--green)')}${bar('Off by one',near,'var(--orange)')}${bar('Further off',far,'var(--danger)')}
     </div>
+    ${FB_ON?'<div class="card" id="board" style="max-width:620px;margin:0 auto 22px"></div>':''}
     <div class="cols panel-in">
       <div><div class="section-head" style="margin-top:0"><h2 style="margin:0">Your guess</h2></div><div class="slots">${rows}</div></div>
       <div><div class="section-head" style="margin-top:0"><h2 style="margin:0">Real ranking</h2></div><div class="slots">
@@ -565,6 +627,7 @@ function renderPlay(l){
     <div class="row" style="margin-top:24px;justify-content:center">
       <button class="primary" id="again">↻ Play again</button><button id="share">Challenge a friend</button><button id="mind">🧠 Send my guess to the setter</button><button onclick="go('home')">More topics</button>
     </div>`;
+    if(FB_ON)showBoard(l,pct,pts);
     document.getElementById('again').onclick=()=>renderPlay(l);
     document.getElementById('share').onclick=()=>copyLink(l);
     document.getElementById('mind').onclick=()=>copyText(location.href.split('#')[0]+'#read='+encObj({t:l.t,c:l.c,i:l.i,g:slots}),'Guess link copied — send it to the setter');

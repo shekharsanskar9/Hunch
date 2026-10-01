@@ -27,3 +27,9 @@ These values are public identifiers, not secrets. Access is controlled by the Fi
 - **Set a ranking** requires sign-in. Published rankings appear for everyone immediately, labelled with the creator's name.
 - Creators can delete their own rankings. Nobody can edit or delete anyone else's.
 - Local rankings made before this was enabled can be pushed online with **Publish**.
+- Each user can publish up to **5 rankings per day** (UTC day, so it resets at 5:30 AM IST). This is enforced by the Firestore rules, not just the page.
+- **Leaderboards:** every ranking has a top-10 board, and the home page shows the all-time top players by points. Scores are saved for signed-in players only.
+
+## Limits
+- Scores are submitted from the browser, so a determined cheater could post a fake score. Preventing that needs server code (Cloud Functions), which requires the paid plan, so it is out of scope for the free setup.
+- Free Spark quota: about 50,000 reads and 20,000 writes per day.

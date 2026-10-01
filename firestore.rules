@@ -1,0 +1,25 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /rankings/{id} {
+      // Anyone can read the community rankings.
+      allow read: if true;
+
+      // Only signed-in users can publish, and only as themselves.
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['t', 'c', 'i', 'uid', 'name', 'createdAt'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.t is string
+        && request.resource.data.t.size() > 0 && request.resource.data.t.size() <= 80
+        && request.resource.data.c is string && request.resource.data.c.size() <= 30
+        && request.resource.data.i is list
+        && request.resource.data.i.size() >= 3 && request.resource.data.i.size() <= 10
+        && request.resource.data.name is string && request.resource.data.name.size() <= 80
+        && request.resource.data.createdAt == request.time;
+
+      // Rankings are immutable; only the creator can delete their own.
+      allow update: if false;
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
+  }
+}

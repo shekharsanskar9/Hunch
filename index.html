@@ -154,6 +154,11 @@ input:focus,select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 
 .author .who b{display:block;font-size:16px}
 .author .who span{color:var(--ink-2);font-size:13px}
 .footer a{color:var(--ink-2);text-decoration:none}.footer a:hover{color:var(--ink);text-decoration:underline}
+.auth{display:flex;align-items:center;gap:8px}
+.auth img,.auth .av{width:28px;height:28px;border-radius:50%;border:1px solid var(--line);object-fit:cover}
+.auth .av{display:grid;place-items:center;font-size:12px;font-weight:800;background:var(--surface-2)}
+.auth .nm{font-size:13px;color:var(--ink-2);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.note{border:1px dashed var(--line);border-radius:4px;padding:10px 12px;font-size:13px;color:var(--ink-2);margin-bottom:14px;line-height:1.5}
 .empty{color:var(--muted);text-align:center;padding:28px 0}
 .footer{margin:32px 0 8px;padding-top:16px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;justify-content:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
 .footer .dot{color:var(--line)}
@@ -162,6 +167,7 @@ input:focus,select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 
   .hero{grid-template-columns:1fr;min-height:auto}
   .art{width:300px}
   .cols{grid-template-columns:1fr}
+  .auth .nm{display:none}
 }
 </style>
 </head>
@@ -175,6 +181,7 @@ input:focus,select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 
     <div class="row">
       <button onclick="go('home')">Play</button>
       <button class="primary" onclick="go('create')">＋ Set a ranking</button>
+      <div class="auth" id="auth"></div>
     </div>
   </div>
   <div id="app"></div>
@@ -279,6 +286,45 @@ const ptsFor=d=>[100,60,30][d]||0;
 function copyText(text,msg){(navigator.clipboard?navigator.clipboard.writeText(text):Promise.reject()).then(()=>toast(msg)).catch(()=>prompt('Copy this:',text))}
 
 const keyOf=l=>l.t+'|'+l.i.join('|');
+
+/* ---------- Online sharing (Firebase) ----------
+   Paste your Firebase web-app config below (see FIREBASE_SETUP.md).
+   Left empty, Hunch runs in local-only mode like before. */
+const FIREBASE_CONFIG={apiKey:'',authDomain:'',projectId:'',appId:''};
+const FB_ON=!!FIREBASE_CONFIG.projectId;
+let fb=null,user=null,community=[],current='home';
+async function initFirebase(){
+  if(!FB_ON)return;
+  try{
+    const base='https://www.gstatic.com/firebasejs/10.12.5/';
+    const [{initializeApp},A,F]=await Promise.all([import(base+'firebase-app.js'),import(base+'firebase-auth.js'),import(base+'firebase-firestore.js')]);
+    const app=initializeApp(FIREBASE_CONFIG),auth=A.getAuth(app),db=F.getFirestore(app);
+    fb={A,F,auth,db};
+    A.onAuthStateChanged(auth,u=>{user=u;renderAuth();if(current==='home')renderHome()});
+    F.onSnapshot(F.query(F.collection(db,'rankings'),F.orderBy('createdAt','desc'),F.limit(60)),snap=>{
+      community=snap.docs.map(d=>({id:d.id,...d.data()})).filter(l=>typeof l.t==='string'&&Array.isArray(l.i)&&l.i.length>=3&&l.i.every(x=>typeof x==='string'));
+      if(current==='home')renderHome();
+    },e=>{console.warn(e);toast('Could not load community rankings')});
+  }catch(e){console.warn(e);toast('Online sharing unavailable')}
+}
+async function signIn(){
+  if(!fb)return null;
+  try{const r=await fb.A.signInWithPopup(fb.auth,new fb.A.GoogleAuthProvider());user=r.user;renderAuth();return user}
+  catch(e){toast('Sign-in cancelled');return null}
+}
+function signOutUser(){fb&&fb.A.signOut(fb.auth).then(()=>toast('Signed out'))}
+function renderAuth(){
+  const el=document.getElementById('auth');if(!el||!FB_ON)return;
+  if(user){
+    const nm=user.displayName||'Player';
+    el.innerHTML=`${user.photoURL?`<img src="${esc(user.photoURL)}" alt="" referrerpolicy="no-referrer">`:`<span class="av">${esc(nm[0].toUpperCase())}</span>`}<span class="nm">${esc(nm)}</span><button class="sm" id="so">Sign out</button>`;
+    document.getElementById('so').onclick=signOutUser;
+  }else{
+    el.innerHTML='<button class="sm" id="si">Sign in with Google</button>';
+    document.getElementById('si').onclick=signIn;
+  }
+}
+const publish=(t,c,items)=>fb.F.addDoc(fb.F.collection(fb.db,'rankings'),{t,c,i:items,uid:user.uid,name:user.displayName||'Anonymous',createdAt:fb.F.serverTimestamp()});
 const badge=c=>{const k=CATS[c]||CATS.General;return `<span class="badge" style="color:${k.color}">${k.icon} ${esc(c)}</span>`};
 function toast(m){const d=document.createElement('div');d.className='toast';d.textContent=m;document.body.appendChild(d);setTimeout(()=>d.remove(),1800)}
 function copyLink(l){
@@ -304,8 +350,10 @@ function go(view){
 
 /* ---------- Home ---------- */
 function renderHome(){
+  current='home';
   const mine=store.get().map(l=>({...l,mine:true}));
-  const all=[...mine,...PRESETS];
+  const online=community.map(l=>({...l,community:true,owner:!!(user&&l.uid===user.uid)}));
+  const all=[...online,...mine,...PRESETS];
   const list=all.filter(l=>filter==='All'||l.c===filter);
   const st=store.getStats();
   $app.innerHTML=`
@@ -384,21 +432,34 @@ function renderHome(){
   if(!list.length)grid.innerHTML='<div class="empty" style="grid-column:1/-1">Nothing here yet — set the first one.</div>';
   list.forEach(l=>{
     const el=document.createElement('div');el.className='card';
-    el.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center">${badge(l.c)}<span class="mono-label">${l.mine?'Yours · ':''}Top ${l.i.length}</span></div>
+    const best=st.bests[keyOf(l)];
+    const tag=l.community?'Community · ':l.mine?'Yours (local) · ':'';
+    const btns=l.mine?`<button class="sm" data-s>Share</button>${FB_ON&&user?'<button class="sm" data-u>Publish</button>':''}<button class="sm danger" data-d>Delete</button>`
+      :l.community?`<button class="sm" data-s>Share</button>${l.owner?'<button class="sm danger" data-d>Delete</button>':''}`:'';
+    el.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center">${badge(l.c)}<span class="mono-label">${tag}Top ${l.i.length}</span></div>
       <h3>${esc(l.t)}</h3>
-      <div class="foot"><button class="primary sm" data-p>▶ Guess</button>${st.bests[keyOf(l)]!=null?`<span class="badge" style="color:var(--green)">★ Best ${st.bests[keyOf(l)]}%</span>`:''}
-      ${l.mine?'<span class="row"><button class="sm" data-s>Share</button><button class="sm danger" data-d>Delete</button></span>':''}</div>`;
+      ${l.community?`<span class="mono-label" style="margin-top:-4px">by ${esc(l.name||'Anonymous')}</span>`:''}
+      <div class="foot"><button class="primary sm" data-p>▶ Guess</button>${best!=null?`<span class="badge" style="color:var(--green)">★ Best ${best}%</span>`:''}
+      ${btns?`<span class="row">${btns}</span>`:''}</div>`;
     el.querySelector('[data-p]').onclick=()=>renderPlay(l);
-    if(l.mine){
-      el.querySelector('[data-s]').onclick=()=>copyLink(l);
-      el.querySelector('[data-d]').onclick=()=>{if(confirm('Delete this ranking?')){store.set(store.get().filter(x=>x.id!==l.id));renderHome()}};
-    }
+    const sh=el.querySelector('[data-s]');if(sh)sh.onclick=()=>copyLink(l);
+    const dl=el.querySelector('[data-d]');
+    if(dl)dl.onclick=async()=>{
+      if(!confirm('Delete this ranking?'))return;
+      if(l.community){try{await fb.F.deleteDoc(fb.F.doc(fb.db,'rankings',l.id));toast('Deleted')}catch(e){toast('Could not delete')}}
+      else{store.set(store.get().filter(x=>x.id!==l.id));renderHome()}
+    };
+    const up=el.querySelector('[data-u]');
+    if(up)up.onclick=async()=>{
+      try{await publish(l.t,l.c,l.i);store.set(store.get().filter(x=>x.id!==l.id));toast('Published for everyone')}catch(e){toast('Could not publish')}
+    };
     grid.appendChild(el);
   });
 }
 
 /* ---------- Create ---------- */
 function renderCreate(){
+  current='create';
   let n=5;
   const draw=(vals=[],title='',cat='Sports')=>{
     $app.innerHTML=`
@@ -408,6 +469,7 @@ function renderCreate(){
         <label class="field">Title<input id="t" maxlength="80" placeholder="e.g. Greatest football clubs of all time" value="${esc(title)}"></label>
         <label class="field">Topic<select id="c">${Object.keys(CATS).map(c=>`<option ${c===cat?'selected':''}>${c}</option>`).join('')}</select></label>
       </div>
+      ${FB_ON?(user?`<div class="note">Publishing as <b>${esc(user.displayName||'you')}</b>. Everyone will see this ranking on the home page.</div>`:'<div class="note">Sign in with Google to publish this ranking for everyone. You can fill it in first.</div>'):'<div class="note">Online sharing is not set up, so this ranking is saved on this device only. You can still share it by link.</div>'}
       <div class="field">Size</div>
       <div class="chips" style="margin:-8px 0 16px">${[3,4,5,6,8,10].map(x=>`<button class="chip ${x===n?'on':''}" data-n="${x}">Top ${x}</button>`).join('')}</div>
       <div class="field" style="margin-bottom:8px">Your ranking — #1 first. Use ↑ ↓ to reorder.</div>
@@ -426,12 +488,20 @@ function renderCreate(){
       box.appendChild(r);
     }
     $app.querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>{const v=cur();n=+b.dataset.n;keep(v)});
-    document.getElementById('save').onclick=()=>{
+    document.getElementById('save').onclick=async()=>{
       const t=document.getElementById('t').value.trim(),items=cur().map(s=>s.trim());
       if(!t)return toast('Add a title');
       if(items.some(s=>!s))return toast('Fill every rank');
       if(new Set(items.map(s=>s.toLowerCase())).size!==items.length)return toast('Items must be unique');
-      const l={id:Date.now(),t,c:document.getElementById('c').value,i:items};
+      const c=document.getElementById('c').value;
+      if(FB_ON){
+        if(!fb)return toast('Still connecting — try again in a moment');
+        if(!user&&!(await signIn()))return;
+        try{await publish(t,c,items);copyLink({t,c,i:items});toast('Published for everyone · link copied')}
+        catch(e){return toast('Could not publish ('+(e.code||'error')+')')}
+        return renderHome();
+      }
+      const l={id:Date.now(),t,c,i:items};
       store.set([l,...store.get()]);copyLink(l);renderHome();
     };
   };
@@ -440,6 +510,7 @@ function renderCreate(){
 
 /* ---------- Play ---------- */
 function renderPlay(l){
+  current='play';
   const N=l.i.length,order=shuffle(l.i),slots=Array(N).fill(null);let step=0;
   const draw=()=>{
     if(step>=N)return result();
@@ -503,6 +574,7 @@ function renderPlay(l){
 
 /* ---------- Mind-Reader ---------- */
 function renderRead(d){
+  current='play';
   const N=d.i.length,order=shuffle(d.i),pred=Array(N).fill(null);let step=0;
   const draw=()=>{
     if(step>=N)return result();
@@ -560,6 +632,7 @@ function renderRead(d){
   const r=location.hash.match(/#read=(.+)/),m=location.hash.match(/#play=(.+)/);
   const rd=r&&decRead(r[1]),l=m&&decode(m[1]);
   rd?renderRead(rd):l?renderPlay(l):renderHome();
+  renderAuth();initFirebase();
 })();
 </script>
 </body>

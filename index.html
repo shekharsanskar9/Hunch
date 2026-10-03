@@ -45,6 +45,16 @@ input:focus,select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 
 /* cards */
 .card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px;margin-bottom:20px;transition:border-color .2s,box-shadow .2s}
 .card:hover{border-color:var(--ink-2);box-shadow:0 4px 24px rgba(0,0,0,.35)}
+.fact-banner{display:flex;align-items:center;gap:14px;background:linear-gradient(90deg,rgba(167,139,250,.14),rgba(59,130,246,.06));border:1px solid var(--line);border-left:3px solid var(--violet);border-radius:6px;padding:13px 16px;margin-bottom:18px}
+.fact-label{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--violet);white-space:nowrap;align-self:flex-start;padding-top:2px}
+.fact-text{margin:0;flex:1;font-size:14px;line-height:1.5;color:var(--ink)}
+.fact-text.fade{animation:factIn .4s ease}
+@keyframes factIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.fact-next{flex:none;width:34px;height:34px;padding:0;display:grid;place-items:center;border-radius:50%;font-size:16px;color:var(--ink-2)}
+.fact-next:hover{color:var(--ink);border-color:var(--violet);transform:rotate(90deg);transition:transform .25s,color .2s,border-color .2s}
+.fact-src{flex:none;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);text-decoration:none;white-space:nowrap;align-self:flex-end}
+.fact-src:hover{color:var(--violet)}
+@media(max-width:560px){.fact-banner{flex-wrap:wrap}.fact-text{flex-basis:100%;order:3}.fact-src{order:4;align-self:flex-start}}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
 .grid .card{margin:0;display:flex;flex-direction:column;gap:10px}
 .grid .card h3{margin:0;font-size:15px;line-height:1.35;font-weight:600}
@@ -311,6 +321,114 @@ const PRESETS = [
   {t:'Emulator systems by release (oldest → newest)',c:'Retro Games',i:['Game Boy','Super Nintendo','PlayStation','Nintendo 64','Dreamcast','GameCube']}
 ];
 
+// A random one is shown on top of the home page and changes every time.
+const FACTS = [
+  // — Space & Science —
+  'A cloud weighs around a million tonnes — yet floats, because it is about 0.4% less dense than the air around it.',
+  "Mars isn't round — it's shaped like a rugby ball, with a different size along each of its three axes.",
+  "Mercury, not Venus, is on average the closest planet to Earth.",
+  "There's a planet mostly made of diamond — 55 Cancri e, about twice Earth's size and 40 light-years away.",
+  'The universe\'s average colour is a beige shade astronomers named "Cosmic latte".',
+  'A lightning bolt is about five times hotter than the surface of the Sun — roughly 30,000°C.',
+  'The Moon drifts about 3cm further from Earth every year.',
+  'Comet 67P smells like rotten eggs, urine, burnt matches and almonds.',
+  "You can see stars as they were 4,000 years ago with the naked eye — light from when the pyramids were built.",
+  "Earth travels about 2.5 million km around the Sun every single day.",
+  "It rains liquid methane on Titan, Saturn's largest moon.",
+  "Someone left a family photo on the Moon — Apollo 16's Charlie Duke, in 1972.",
+  "A rainbow on Venus is called a 'glory' — coloured rings made by light bending inside droplets.",
+  'Earth is 4.54 billion years old — about a third the age of the universe.',
+  "Our solar system has a 'wall' — the heliopause, where the solar wind can no longer push back interstellar particles.",
+  // — Nature & animals —
+  "Hippos can't swim — they're so dense they gallop along the riverbed instead.",
+  'Polar bears have jet-black skin under their fur, which is actually see-through, not white.',
+  'Starfish are basically all head — they have no body in the usual sense.',
+  'Most ginger cats are male, because the ginger gene sits on the X chromosome.',
+  "Orcas have been seen wearing dead fish as hats — and no one knows why.",
+  'Platypuses sweat milk, because they have no teats.',
+  'Giraffes hum to each other at night, possibly to stay in contact in the dark.',
+  'Flamingos are born grey — they turn pink from a diet of brine shrimp and algae.',
+  'Glass sponges can live for around 15,000 years.',
+  'Cats prefer to sleep on their left side, which may help them watch for danger on waking.',
+  "Deep-sea male anglerfish don't just mate — they fuse into the female and become a living sac of sperm.",
+  'Bats are not blind — they can see fine, but still hunt by echolocation.',
+  'The biggest butterfly has a 31cm wingspan — the Queen Alexandra\'s Birdwing of Papua New Guinea.',
+  "Wind-turbine bird deaths drop about 70% if you paint just one blade black.",
+  // — The human body —
+  "Identical twins don't have identical fingerprints — the womb shapes each one differently.",
+  'About 60% of your body is water, which is why your weight can swing 0.5–2kg day to day.',
+  'There are more bacterial cells in your body than human cells — but by weight you\'re 99.7% human.',
+  'Even when you read silently, the muscles of your mouth, tongue and larynx quietly fire.',
+  "You've never truly touched anything — electrons repel, so you hover a fraction above every surface.",
+  "You'll spend about three and a half years of your life blinking.",
+  "Earlobes may have no real biological purpose at all.",
+  'Bacteria on your skin — Staphylococcus aureus — are what trigger many of your itches.',
+  "It's physically impossible to swallow your own tongue.",
+  'The longest anyone has held their breath underwater is over 24.5 minutes.',
+  'The interstitium, possibly your largest organ, was only recognised in the last decade.',
+  // — Earth & geography —
+  "Mount Everest isn't the tallest mountain — measured from its base, Hawaii's Mauna Kea beats it.",
+  "We've mapped less than 0.001% of the deep ocean floor — less than the Moon.",
+  'The deepest ocean point, Challenger Deep, is over 10,900m down.',
+  "Sea level isn't actually level — Earth's spin and gravity make it bulge and dip.",
+  "Earth's day is getting longer by about 1.8 seconds per century — 600m years ago a day was 21 hours.",
+  "Earth's magnetic poles are wandering — the north pole now moves about 55km a year.",
+  'The quietest place on Earth measures −20.6 decibels — Microsoft\'s anechoic chamber.',
+  "There's a 1,200km² zone in France still sealed off a century after WWI, too full of live shells.",
+  // — Oddly useful / surprising —
+  'Leftover pasta, cooked then cooled, forms resistant starch that\'s better for your blood sugar and gut.',
+  "It's surprisingly hard to sink in quicksand — it\'s denser than you, so lie back and wiggle out slowly.",
+  "You can't fold a normal sheet of paper more than about 8 times by hand.",
+  'A LEGO brick can bear the weight of some 375,000 other bricks before it fails.',
+  "In any room of 23 people, there's a better-than-even chance two share a birthday.",
+  'Chainsaws were first invented to assist with childbirth.',
+  'Board games are linked to a lower risk of dementia as you age.',
+  // — HISTORY —
+  "Medieval war horses were about the size of a modern pony.",
+  "The sharpest teeth ever measured belonged to conodonts — tiny eel-like animals, tips 1/20th the width of a hair.",
+  'There are stone circles older than Stonehenge — one in Australia is about 10,000 years old.',
+  'Ancient Egyptian mummies smell woody, spicy and faintly sweet.',
+  // — TECH / CODING / APPS —
+  'The first computer "bug" was a real moth, taped into a 1947 logbook by Grace Hopper\'s team.',
+  "The '@' sign in email was chosen in 1971 simply because it was the one symbol that couldn't appear in a name.",
+  'The QWERTY keyboard was laid out in the 1870s partly to stop typewriter arms from jamming.',
+  'There are two hard things in computer science — cache invalidation, naming things, and off-by-one errors.',
+  'The word "robot" comes from a 1920 Czech play and means "forced labour".',
+  'Wi-Fi doesn\'t stand for anything — it was coined just to sound like "hi-fi".',
+  // — VIDEO GAMES / RETRO GAMES —
+  "Pac-Man's ghosts each follow their own chase personality — one even runs away from you.",
+  "The 'Konami Code' (↑↑↓↓←→←→BA) first appeared in Gradius in 1986.",
+  'Tetris was created in 1984 by Alexey Pajitnov on a Soviet Elektronika 60.',
+  'The Nintendo Game Boy sold over 118 million units and survived being blown up in the Gulf War — and still worked.',
+  'Super Mario was originally called "Jumpman" and was a carpenter, not a plumber.',
+  'The best-selling video game of all time is Minecraft, at over 300 million copies.',
+  // — SPORTS —
+  'Teams playing in red kits tend to win slightly more often — the colour may read as dominant.',
+  'A golf ball has around 300–500 dimples, which cut drag and make it fly roughly twice as far.',
+  'The fastest recorded sports projectile is a badminton smash, over 400 km/h.',
+  'Martial artists who smile just before a fight are statistically more likely to lose.',
+  // — CARS / BIKES / TRAVEL —
+  '"New car smell" is a cocktail of over 200 chemicals off-gassing from the interior.',
+  'A real horse can briefly put out around 24 horsepower — far more than one.',
+  'The fastest jet ever, NASA\'s X-43, flew at nearly 10 times the speed of sound.',
+  'The Bermuda Triangle is statistically no more dangerous than any other busy stretch of ocean.',
+  // — BRANDS / FASHION / COLORS —
+  'Wearing a tie too tight can cut blood flow to your brain by up to 7.5%.',
+  'Football teams in red aside, colour changes how others perceive you — and how you feel.',
+  'Most world maps are wrong — the Mercator projection makes Greenland look as big as Africa, though it\'s 14× smaller.',
+  'Newborns don\'t see in black and white — they pick up strong colours first, especially red.',
+  // — DRINKS / CHOCOLATES / FOOD —
+  'There\'s no such thing as a zero-calorie food — even celery costs the body energy, but not zero.',
+  'A rare condition, auto-brewery syndrome, lets the gut ferment carbs into actual alcohol.',
+  'On most common antibiotics a moderate drink is fine — metronidazole is a notable exception.',
+  'Trap-jaw ants give off a chocolatey smell when annoyed.',
+  // — PENS / EDUCATION / GENERAL —
+  'The fear of long words is, cruelly, called hippopotomonstrosesquippedaliophobia.',
+  'Finland has been ranked the happiest country on Earth for years running — and has a sauna for every 1.6 people.',
+  'Being bored is physiologically a "high-arousal" state — your heart rate actually rises.',
+  'Laughter is older than language — baby apes laugh with the same vocal structure we do.'
+];
+
 /* ---------- Helpers ---------- */
 const $app=document.getElementById('app');
 let filter='All';
@@ -325,6 +443,8 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 const encode=l=>btoa(unescape(encodeURIComponent(JSON.stringify({t:l.t,c:l.c,i:l.i}))));
 const decode=s=>{try{const o=JSON.parse(decodeURIComponent(escape(atob(s))));return(o&&o.t&&Array.isArray(o.i)&&o.i.length>=3)?o:null}catch(e){return null}};
 const shuffle=(a,rnd=Math.random)=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+let _lastFact=-1;
+const pickFact=()=>{let i;do{i=Math.floor(Math.random()*FACTS.length)}while(FACTS.length>1&&i===_lastFact);_lastFact=i;return FACTS[i]};
 const encObj=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o))));
 const decObj=s=>{try{return JSON.parse(decodeURIComponent(escape(atob(s))))}catch(e){return null}};
 const decRead=s=>{const o=decObj(s);return(o&&o.t&&Array.isArray(o.i)&&Array.isArray(o.g)&&o.g.length===o.i.length&&new Set(o.g).size===o.i.length&&o.g.every(x=>o.i.includes(x)))?o:null};
@@ -522,6 +642,12 @@ function renderHome(){
   const list=all.filter(l=>filter==='All'||l.c===filter);
   const st=store.getStats();
   $app.innerHTML=`
+  <div class="fact-banner" id="factBanner">
+    <span class="fact-label">💡 Did you know?</span>
+    <p class="fact-text" id="factText">${esc(pickFact())}</p>
+    <button class="fact-next" id="factNext" title="Another fact" aria-label="Show another fact">↻</button>
+    <a class="fact-src" href="https://www.sciencefocus.com/science/fun-facts" target="_blank" rel="noopener" title="Facts adapted from BBC Science Focus">via BBC Science Focus</a>
+  </div>
   <section class="hero">
     <div class="hero-content">
       <div class="brand-text">Hunch</div>
@@ -598,6 +724,7 @@ function renderHome(){
   startHero();syncSnd();
   document.getElementById('codeBtn').onclick=openCode;
   document.getElementById('readBtn').onclick=openCode;
+  document.getElementById('factNext').onclick=()=>{const t=document.getElementById('factText');t.textContent=pickFact();t.classList.remove('fade');void t.offsetWidth;t.classList.add('fade')};
     const grid=document.getElementById('grid');
   if(!list.length)grid.innerHTML='<div class="empty" style="grid-column:1/-1">Nothing here yet — set the first one.</div>';
   list.forEach((l,ix)=>{

@@ -1,14 +1,19 @@
+
 # 🧠 Hunch — How Well Do You Really Know Your Rankings?
 
-\<p align="center">
-&#x20; \<strong>Think you know what's best? Prove it without seeing what's next.\</strong>
-&#x20; \<br>\<br>
-&#x20; A blind ranking game where every decision counts.
-&#x20; \<br>\<br>
-&#x20; \<a href="[https://shekharsanskar9.github.io/Hunch/](https://shekharsanskar9.github.io/Hunch/)">\<strong>🎮 Play Hunch\</strong>\</a>
-&#x20; &nbsp; · &nbsp;
-&#x20; \<a href="[https://github.com/shekharsanskar9/Hunch](https://github.com/shekharsanskar9/Hunch)">⭐ GitHub Repository\</a>
-\</p>
+<p align="center">
+  <strong>Think you know what's best? Prove it without seeing what's next.</strong>
+  <br><br>
+  A blind ranking game where every decision counts.
+  <br><br>
+  <a href="https://shekharsanskar9.github.io/Hunch/">
+    <strong>🎮 Play Hunch</strong>
+  </a>
+  &nbsp; · &nbsp;
+  <a href="https://github.com/shekharsanskar9/Hunch">
+    ⭐ GitHub Repository
+  </a>
+</p>
 
 ---
 
@@ -22,8 +27,8 @@ You probably have an opinion. But can you rank them correctly when you don't kno
 
 Items appear one at a time. Your task is to assign each item a position without knowing what comes next. Every placement is final, so think carefully before locking it in!
 
-\<details>
-\<summary>\<strong>👀 See how it works\</strong>\</summary>
+<details>
+<summary><strong>👀 See how it works</strong></summary>
 
 Imagine ranking planets by size:
 
@@ -36,20 +41,22 @@ Once all items are placed, your ranking is compared with the actual order.
 
 **Remember: You cannot change your previous decisions!**
 
-\</details>
+</details>
 
 ## 🚀 Game Modes
 
-| Mode                  | Description                                                      |
-| --------------------- | ---------------------------------------------------------------- |
-| 🎯 Ready-to-Play      | Explore 41 preset rankings across 23 categories.                 |
-| 🛠️ Custom Rankings   | Create your own Top 3–10 challenges and share them with friends. |
-| 🌐 Community Rankings | Discover and play rankings created by other players.             |
-| 🧠 Mind-Reader Mode   | Predict how your friend ranked each item.                        |
+| Mode | Description |
+|---|---|
+| 🎯 Ready-to-Play | Explore 41 preset rankings across 23 categories. |
+| 🛠️ Custom Rankings | Create your own Top 3–10 challenges and share them with friends. |
+| 🌐 Community Rankings | Discover and play rankings created by other players. |
+| 🧠 Mind-Reader Mode | Predict how your friend ranked each item. |
 
-\<p align="center">
-&#x20; \<a href="[https://shekharsanskar9.github.io/Hunch/](https://shekharsanskar9.github.io/Hunch/)">\<strong>🧠 START PLAYING →\</strong>\</a>
-\</p>
+<p align="center">
+  <a href="https://shekharsanskar9.github.io/Hunch/">
+    <strong>🧠 START PLAYING →</strong>
+  </a>
+</p>
 
 ---
 
@@ -69,24 +76,24 @@ Once all items are placed, your ranking is compared with the actual order.
 
 Your score depends on how close each placement is to its actual position.
 
-| Placement Accuracy         |  Points |
-| -------------------------- | ------: |
-| Exact position             | **100** |
-| Off by 1 position          |      60 |
-| Off by 2 positions         |      30 |
-| Off by 3 or more positions |       0 |
+| Placement Accuracy | Points |
+|---|---:|
+| Exact position | **100** |
+| Off by 1 position | 60 |
+| Off by 2 positions | 30 |
+| Off by 3 or more positions | 0 |
 
 ### Your Hunch Level
 
 Your final percentage determines your rank.
 
-| Rank          |         Score | Description             |
-| ------------- | ------------: | ----------------------- |
-| 🐣 Rookie     |     Below 40% | Just getting started    |
+| Rank | Score | Description |
+|---|---:|---|
+| 🐣 Rookie | Below 40% | Just getting started |
 | ⚔️ Challenger | 40% and above | Building your instincts |
-| 🎓 Expert     | 60% and above | Knows their rankings    |
-| 👑 Master     | 80% and above | Almost unbeatable       |
-| 🏆 Legend     |          100% | Perfect ranking!        |
+| 🎓 Expert | 60% and above | Knows their rankings |
+| 👑 Master | 80% and above | Almost unbeatable |
+| 🏆 Legend | 100% | Perfect ranking! |
 
 **Can you earn the Legend title?**
 
@@ -96,16 +103,16 @@ Your final percentage determines your rank.
 
 Hunch is built as a lightweight, dependency-free frontend application.
 
-| Technology               | Purpose                             |
-| ------------------------ | ----------------------------------- |
-| HTML5                    | Application structure               |
-| CSS3                     | Styling and animations              |
-| Vanilla JavaScript       | Game logic and interactions         |
-| Firebase Authentication  | Optional Google sign-in             |
-| Cloud Firestore          | Community rankings and leaderboards |
-| Browser localStorage     | Local data persistence              |
-| URL Hash + JSON + Base64 | Shareable custom rankings           |
-| GitHub Pages             | Deployment                          |
+| Technology | Purpose |
+|---|---|
+| HTML5 | Application structure |
+| CSS3 | Styling and animations |
+| Vanilla JavaScript | Game logic and interactions |
+| Firebase Authentication | Optional Google sign-in |
+| Cloud Firestore | Community rankings and leaderboards |
+| Browser localStorage | Local data persistence |
+| URL Hash + JSON + Base64 | Shareable custom rankings |
+| GitHub Pages | Deployment |
 
 ### Why Vanilla JavaScript?
 
@@ -225,6 +232,7 @@ For more details, refer to:
 ## 👨‍💻 Developer
 
 **Sanskar Shekhar**
+
 Computer Science and Engineering · BIT Mesra
 
 - [GitHub Profile](https://github.com/shekharsanskar9)
@@ -233,4 +241,12 @@ Computer Science and Engineering · BIT Mesra
 
 ---
 
-\<p align="center">   \<strong>Built for curious minds and confident guesses.\</strong>   \<br>   Play a round. Trust your hunch. 🧠   \<br>\<br>   \<a href="[https://shekharsanskar9.github.io/Hunch/](https://shekharsanskar9.github.io/Hunch/)">\<strong>🎮 PLAY HUNCH\</strong>\</a> \</p>
+<p align="center">
+  <strong>Built for curious minds and confident guesses.</strong>
+  <br>
+  Play a round. Trust your hunch. 🧠
+  <br><br>
+  <a href="https://shekharsanskar9.github.io/Hunch/">
+    <strong>🎮 PLAY HUNCH</strong>
+  </a>
+</p>

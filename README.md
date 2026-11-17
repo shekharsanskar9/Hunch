@@ -1,162 +1,236 @@
 # 🧠 Hunch — How Well Do You Really Know Your Rankings?
 
-**A blind ranking game where every decision counts.**
-
-Think you know the biggest planets, best games, most popular brands, or greatest athletes? Hunch puts your intuition to the test. Rank each item as it appears, lock in your choice, and see how close you came to the real order.
-
-<p align="center">
-  <a href="https://shekharsanskar9.github.io/Hunch/">
-    🎮 Play Hunch
-  </a>
-  &nbsp; | &nbsp;
-  <a href="https://github.com/shekharsanskar9/Hunch">
-    GitHub Repository
-  </a>
-</p>
+\<p align="center">
+&#x20; \<strong>Think you know what's best? Prove it without seeing what's next.\</strong>
+&#x20; \<br>\<br>
+&#x20; A blind ranking game where every decision counts.
+&#x20; \<br>\<br>
+&#x20; \<a href="[https://shekharsanskar9.github.io/Hunch/](https://shekharsanskar9.github.io/Hunch/)">\<strong>🎮 Play Hunch\</strong>\</a>
+&#x20; &nbsp; · &nbsp;
+&#x20; \<a href="[https://github.com/shekharsanskar9/Hunch](https://github.com/shekharsanskar9/Hunch)">⭐ GitHub Repository\</a>
+\</p>
 
 ---
 
-## 🎮 How to Play
+## 🎮 About the Game
 
-1. **Pick a ranking** — Choose a topic or create your own.
-2. **Trust your instincts** — Items appear one at a time, and you must assign each one a rank without seeing what's coming next.
-3. **Lock it in** — Every placement is final. No changing your mind!
-4. **Reveal your score** — Compare your guesses against the actual ranking and find out whether you're a Rookie, Challenger, Expert, Master, or Legend.
+What is the biggest planet? Which game deserves the top spot? Who is the greatest athlete?
 
-**The challenge?** You need to think ahead when you don't know what comes next.
+You probably have an opinion. But can you rank them correctly when you don't know what's coming next?
+
+**Hunch** is a blind ranking game that tests your knowledge, intuition, and decision-making.
+
+Items appear one at a time. Your task is to assign each item a position without knowing what comes next. Every placement is final, so think carefully before locking it in!
+
+\<details>
+\<summary>\<strong>👀 See how it works\</strong>\</summary>
+
+Imagine ranking planets by size:
+
+1. Jupiter appears. You place it at #1.
+2. Mars appears. You place it at #3.
+3. Saturn appears. You must decide whether it belongs at #1 or #2.
+4. Earth appears. You have to work with the remaining positions.
+
+Once all items are placed, your ranking is compared with the actual order.
+
+**Remember: You cannot change your previous decisions!**
+
+\</details>
+
+## 🚀 Game Modes
+
+| Mode                  | Description                                                      |
+| --------------------- | ---------------------------------------------------------------- |
+| 🎯 Ready-to-Play      | Explore 41 preset rankings across 23 categories.                 |
+| 🛠️ Custom Rankings   | Create your own Top 3–10 challenges and share them with friends. |
+| 🌐 Community Rankings | Discover and play rankings created by other players.             |
+| 🧠 Mind-Reader Mode   | Predict how your friend ranked each item.                        |
+
+\<p align="center">
+&#x20; \<a href="[https://shekharsanskar9.github.io/Hunch/](https://shekharsanskar9.github.io/Hunch/)">\<strong>🧠 START PLAYING →\</strong>\</a>
+\</p>
+
+---
 
 ## ✨ Features
 
-| Feature                       | Description                                                                                                  |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| 🕶️ **Blind Ranking**         | Place items one at a time without knowing the upcoming items.                                                |
-| 🗂️ **Ready-to-Play Topics**  | Explore 41 preset rankings across 23 categories, from science and sports to coding, games, brands, and more. |
-| 🛠️ **Create Your Own**       | Build custom Top 3–10 rankings and challenge friends using shareable links.                                  |
-| 🎯 **Scoring System**         | Earn 100 points for an exact placement, 60 for one position away, and 30 for two positions away.             |
-| 🏆 **Leaderboards**           | Compete for your best score on individual rankings and climb the all-time player leaderboard.                |
-| 🌐 **Community Rankings**     | Sign in with Google to publish rankings and explore creations from other players.                            |
-| 🧠 **Mind-Reader Mode**       | Exchange guesses with a friend and predict how they ranked each item.                                        |
-| 💾 **Local-First Gameplay**   | Play without Firebase using browser-based storage and shareable ranking links.                               |
-| 🎉 **Interactive Experience** | Enjoy animated feedback, sound effects, confetti, and score reveals.                                         |
+- 🕶️ **Blind Ranking:** Place items one at a time without knowing what's coming next.
+- 🗂️ **41 Preset Rankings:** Explore 23 categories, including science, sports, coding, games, and brands.
+- 🛠️ **Custom Rankings:** Build and share your own Top 3–10 challenges.
+- 🎯 **Scoring System:** Earn points based on the accuracy of your placements.
+- 🏆 **Leaderboards:** Track personal bests and compete with other players.
+- 🌐 **Community Rankings:** Sign in with Google to publish and explore rankings.
+- 🧠 **Mind-Reader Mode:** Exchange guesses and predict your friend's choices.
+- 💾 **Local-First Gameplay:** Play without Firebase using browser storage and shareable links.
+- 🎉 **Interactive Experience:** Enjoy animations, sound effects, confetti, and score reveals.
 
-## 🧠 The Scoring System
+## 🏆 Scoring System
 
-Your score depends on how close each placement is to the correct position.
+Your score depends on how close each placement is to its actual position.
 
-| Placement          | Points |
-| ------------------ | -----: |
-| Exact position     |    100 |
-| Off by 1 position  |     60 |
-| Off by 2 positions |     30 |
-| Off by 3 or more   |      0 |
+| Placement Accuracy         |  Points |
+| -------------------------- | ------: |
+| Exact position             | **100** |
+| Off by 1 position          |      60 |
+| Off by 2 positions         |      30 |
+| Off by 3 or more positions |       0 |
 
-Your final percentage determines your title:
+### Your Hunch Level
 
-- 🐣 **Rookie** — Getting started
-- ⚔️ **Challenger** — 40% and above
-- 🎓 **Expert** — 60% and above
-- 👑 **Master** — 80% and above
-- 🏆 **Legend** — 100%
+Your final percentage determines your rank.
 
-*Can you earn the Legend title?*
+| Rank          |         Score | Description             |
+| ------------- | ------------: | ----------------------- |
+| 🐣 Rookie     |     Below 40% | Just getting started    |
+| ⚔️ Challenger | 40% and above | Building your instincts |
+| 🎓 Expert     | 60% and above | Knows their rankings    |
+| 👑 Master     | 80% and above | Almost unbeatable       |
+| 🏆 Legend     |          100% | Perfect ranking!        |
+
+**Can you earn the Legend title?**
+
+---
 
 ## 🛠️ Tech Stack
 
 Hunch is built as a lightweight, dependency-free frontend application.
 
-- **Frontend:** HTML5, CSS3, Vanilla JavaScript
-- **Backend / Cloud:** Firebase Authentication and Cloud Firestore (optional)
-- **Data persistence:** Browser `localStorage`
-- **Sharing:** URL hash routing with JSON and Base64 encoding
-- **Deployment:** GitHub Pages
+| Technology               | Purpose                             |
+| ------------------------ | ----------------------------------- |
+| HTML5                    | Application structure               |
+| CSS3                     | Styling and animations              |
+| Vanilla JavaScript       | Game logic and interactions         |
+| Firebase Authentication  | Optional Google sign-in             |
+| Cloud Firestore          | Community rankings and leaderboards |
+| Browser localStorage     | Local data persistence              |
+| URL Hash + JSON + Base64 | Shareable custom rankings           |
+| GitHub Pages             | Deployment                          |
 
 ### Why Vanilla JavaScript?
 
-The entire application lives in a single `index.html` file. There is no framework, bundler, build step, or npm dependency. This keeps the application lightweight and easy to run, inspect, and extend.
+The entire application lives in a single `index.html` file.
 
-## 🏗️ Architecture
+- No frontend framework.
+- No bundler or build process.
+- No npm dependencies.
+- Easy to run, inspect, and extend.
+
+This keeps Hunch lightweight and straightforward to maintain.
+
+## 🏗️ Project Structure
 
 ```text
-Hunch
+Hunch/
 │
-├── index.html          # UI, styles, game logic and Firebase integration
+├── index.html          # UI, styling, game logic and Firebase integration
 ├── firestore.rules     # Firestore security and validation rules
 ├── firebase.json       # Firebase CLI configuration
 ├── .firebaserc         # Default Firebase project
 ├── README.md           # Project overview and setup
-├── DOCUMENTATION.md    # Technical architecture and implementation details
+├── DOCUMENTATION.md    # Technical architecture and implementation
 └── FIREBASE_SETUP.md   # Firebase configuration guide
 ```
 
-**Two ways to play:**
+## 💾 Local Mode vs Online Mode
 
-- **Local mode:** Rankings, gameplay, scoring, and shareable links work without a Firebase backend. Locally created rankings and statistics use browser storage.
-- **Online mode:** Firebase adds Google sign-in, community rankings, and leaderboards. Publishing is limited to five rankings per UTC day, enforced by Firestore security rules.
+Hunch supports two gameplay environments.
 
-For the complete implementation details, see [DOCUMENTATION.md](DOCUMENTATION.md).
+### Local Mode
 
-## 🚀 Getting Started
+No Firebase configuration or account is required.
+
+- Play preset and custom rankings.
+- Save statistics using browser storage.
+- Generate and share custom ranking links.
+- Access core gameplay without an internet-connected backend.
+
+### Online Mode
+
+Firebase enables additional community features:
+
+- Google authentication.
+- Community ranking publication.
+- Online leaderboards.
+
+Publishing is limited to five rankings per UTC day, enforced through Firestore security rules.
+
+---
+
+## 💻 Getting Started
+
+Want to run Hunch locally or explore the source code?
 
 ### Prerequisites
 
-A modern web browser. Python 3 is optional and only needed if you prefer running a local HTTP server.
+- A modern web browser.
+- Git.
+- Python 3 (optional, for running a local HTTP server).
 
-### Run locally
-
-**Option 1: Open directly**
-
-Clone the repository and open `index.html` in your browser.
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/shekharsanskar9/Hunch.git
 cd Hunch
 ```
 
-**Option 2: Use a local server**
+### 2. Run the application
+
+**Option 1: Open directly**
+
+Open `index.html` in your browser.
+
+**Option 2: Start a local server**
 
 ```bash
 python3 -m http.server 8000
 ```
 
-Open [http://localhost:8000](http://localhost:8000) in your browser.
+Open `http://localhost:8000` in your browser.
 
-### Enable Firebase (optional)
+### 3. Configure Firebase (Optional)
 
 To enable Google sign-in, community rankings, and online leaderboards:
 
-1. Follow the instructions in [FIREBASE_SETUP.md](FIREBASE_SETUP.md).
-2. Configure the Firebase project and its authentication settings.
-3. Add the Firebase configuration to the application.
-4. Deploy the Firestore security rules.
+1. Follow the instructions in `FIREBASE_SETUP.md`.
+2. Configure your Firebase project.
+3. Enable Google Authentication.
+4. Add your Firebase configuration to the application.
+5. Deploy the Firestore security rules.
 
-Without Firebase configuration, the game remains playable in local mode.
+Local gameplay works without Firebase.
 
-## 🔒 Security Notes
+---
 
-- Firestore security rules validate published rankings, enforce ownership, and apply the daily publishing limit.
-- Ranking data is immutable after publication, except that the creator can delete their own ranking.
-- Leaderboard entries are restricted to the authenticated user's own record and best-score updates.
-- Scores are submitted by the client, so server-side gameplay verification is not implemented. A determined user could submit a fabricated score within the permitted bounds.
+## 🔒 Security & Limitations
 
-See [FIREBASE_SETUP.md](FIREBASE_SETUP.md) for configuration and [DOCUMENTATION.md](DOCUMENTATION.md) for the security model.
+- Firestore rules validate published rankings and enforce ownership.
+- Users can delete their own published rankings.
+- Leaderboard entries are restricted to authenticated users' own records and best-score updates.
+- Daily publishing limits are enforced through Firestore security rules.
+- Scores are submitted by the client. Server-side gameplay verification is not implemented, so users could submit fabricated scores within the permitted bounds.
 
-## 🗺️ Roadmap Ideas
+For more details, refer to:
 
-- [ ] Add more ranking topics and community-created presets.
+- [Technical Documentation](DOCUMENTATION.md)
+- [Firebase Setup Guide](FIREBASE_SETUP.md)
+
+## 🗺️ Future Improvements
+
+- [ ] Expand preset rankings and community topics.
 - [ ] Improve mobile gameplay and accessibility.
 - [ ] Introduce additional competitive game modes.
 - [ ] Explore stronger server-side score validation.
 
-## 👨‍💻 Author
+## 👨‍💻 Developer
 
 **Sanskar Shekhar**
 Computer Science and Engineering · BIT Mesra
 
-[GitHub](https://github.com/shekharsanskar9) · [Play Hunch](https://shekharsanskar9.github.io/Hunch/)
+- [GitHub Profile](https://github.com/shekharsanskar9)
+- [Project Repository](https://github.com/shekharsanskar9/Hunch)
+- [Live Application](https://shekharsanskar9.github.io/Hunch/)
 
 ---
 
-\<p align="center">
-&#x20; \<strong>Built for curious minds and confident guesses.\</strong>\<br>
-&#x20; Play a round. Trust your hunch. 🧠
-\</p>
+\<p align="center">   \<strong>Built for curious minds and confident guesses.\</strong>   \<br>   Play a round. Trust your hunch. 🧠   \<br>\<br>   \<a href="[https://shekharsanskar9.github.io/Hunch/](https://shekharsanskar9.github.io/Hunch/)">\<strong>🎮 PLAY HUNCH\</strong>\</a> \</p>
